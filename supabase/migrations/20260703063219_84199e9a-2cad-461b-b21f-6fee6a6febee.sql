@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.can_access_booking(uuid, uuid) FROM anon;

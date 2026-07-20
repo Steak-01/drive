@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.enforce_booking_student_limits() FROM PUBLIC, anon, authenticated;
