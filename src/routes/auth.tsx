@@ -8,7 +8,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft } from "lucide-react";
-import logo from "../assets/logo1.jpeg";
+import logo from "../assets/logo-b.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -168,7 +168,13 @@ function AuthPage() {
 
         <div className="rounded-xl border border-border bg-card p-7 shadow-card">
           <div className="flex flex-col items-center text-center">
-            <img src={logo} alt="" className="h-12 w-12" width={48} height={48} />
+            <img
+            src={logo}
+            alt="Nthlakusani & Jama Driving School logo"
+            className="h-10 w-10 shrink-0 rounded-full object-cover border-2 border-primary"
+            width={40}
+            height={40}
+          />
             <h1 className="mt-3 font-display text-2xl font-bold uppercase">
               {mode === "signin" ? "Sign In" : "Create Account"}
             </h1>

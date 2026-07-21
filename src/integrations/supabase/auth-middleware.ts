@@ -2,6 +2,7 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
+import ws from "ws";
 import type { Database } from "./types";
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
@@ -51,15 +52,13 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
         persistSession: false,
         autoRefreshToken: false,
       },
+      realtime: {
+        transport: ws as any,
+      },
     });
-
-    console.log("1. Client created");
 
     const { data, error } = await supabase.auth.getClaims(token);
 
-    console.log("2. Claims fetched");
-    console.log(data);
-    console.log(error);
     if (error || !data?.claims) {
       throw new Error("Unauthorized: Invalid token");
     }

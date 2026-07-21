@@ -95,6 +95,8 @@ function AdminDashboard() {
   const bookings = useQuery({ queryKey: ["admin-bookings"], queryFn: () => listBookings() });
   const inquiries = useQuery({ queryKey: ["admin-inquiries"], queryFn: () => listInquiries() });
 
+  if (bookings.error) console.error("admin-bookings error:", bookings.error);
+
   const inquiryMutation = useMutation({
     mutationFn: (input: { inquiryId: string; status?: string; admin_notes?: string }) =>
       updateInquiry({ data: input }),

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { services, learnersLicence, contactInfo } from "../data/site";
-import heroImg from "../assets/relate.png";
+import heroImg from "../assets/logo2.png";
 import fleetImg from "../assets/fleet.jpg";
 
 export const Route = createFileRoute("/")({
@@ -144,7 +144,7 @@ function Home() {
             <img
               src={heroImg}
               alt="Driving instructor teaching a learner driver"
-              className="aspect-[4/3] w-full rounded-xl object-cover shadow-strong"
+              className="h-full w-full rounded-xl object-cover"
               width={1600}
               height={1100}
             />

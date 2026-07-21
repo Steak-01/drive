@@ -1,22 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldCheck, Target, HeartHandshake, Award, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Clock, HeartHandshake, Award, CheckCircle2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { contactInfo } from "../data/site";
 import heroImg from "../assets/hero.jpg";
+import logoBadge from "../assets/logo-badge.png";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — Nthlakusani & Jama Driving School" },
+      { title: "About Us — NJ Shuttle Services" },
       {
         name: "description",
         content:
-          "Nthlakusani & Jama Driving School & Shuttle Services — professional, patient instructors helping South Africans drive forward since 2026.",
+          "NJ Shuttle Services — reliable airport transfers, corporate shuttles and inter-city transport across South Africa. Kings of Comfort, Choose Wisely.",
       },
-      { property: "og:title", content: "About Us — Nthlakusani & Jama Driving School" },
+      { property: "og:title", content: "About Us — NJ Shuttle Services" },
       {
         property: "og:description",
-        content: "Professional driving school and shuttle services. We Drive You Forward!",
+        content: "Professional shuttle transport across South Africa. Kings of Comfort, Choose Wisely.",
       },
     ],
   }),
@@ -27,22 +28,22 @@ const values = [
   {
     icon: ShieldCheck,
     title: "Safety First",
-    text: "Defensive driving habits that last a lifetime, taught from day one.",
+    text: "Vetted, background-checked drivers and roadworthy vehicles on every route.",
   },
   {
-    icon: Target,
-    title: "Results Driven",
-    text: "Structured lessons and progress tracking built around passing your test.",
+    icon: Clock,
+    title: "On Time, Every Time",
+    text: "Live tracking and realistic ETAs, so you're never left guessing when your ride will arrive.",
   },
   {
     icon: HeartHandshake,
-    title: "Patient & Inclusive",
-    text: "Welcoming instructors for nervous beginners and learners of all ages.",
+    title: "Comfort & Care",
+    text: "Friendly, professional drivers and a smooth ride, from a solo airport run to a full group booking.",
   },
   {
     icon: Award,
     title: "Professional Standards",
-    text: "Certified instructors, roadworthy vehicles and reliable service.",
+    text: "Licensed drivers, insured vehicles and dependable service you can build a schedule around.",
   },
 ];
 
@@ -55,11 +56,11 @@ function About() {
             {contactInfo.since}
           </p>
           <h1 className="mt-2 font-display text-4xl font-bold uppercase sm:text-5xl">
-            About Our School
+            About NJ Shuttle Services
           </h1>
           <p className="mt-4 max-w-2xl text-white/80">
-            {contactInfo.name} is committed to creating safe, confident drivers across South Africa
-            through professional instruction and reliable shuttle services.
+            {contactInfo.name} is committed to getting you where you need to be — safely, on time
+            and in comfort — with professional drivers and a fleet you can trust.
           </p>
         </div>
       </section>
@@ -67,25 +68,27 @@ function About() {
       <section className="section-pad">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div>
-            <h2 className="font-display text-3xl font-bold uppercase">We Drive You Forward</h2>
+            <h2 className="font-display text-3xl font-bold uppercase">
+              Kings of Comfort, Choose Wisely
+            </h2>
             <p className="mt-4 text-muted-foreground">
-              Whether you&apos;re booking your first learner&apos;s licence or upgrading to a
-              heavy-vehicle code, our mission is simple: equip every student with the skills,
-              confidence and support to pass and stay safe on the road.
+              Whether you&apos;re catching an early flight, moving a team across the city, or
+              getting a wedding party where it needs to be, our mission is simple: get every
+              passenger there safely, on time and in comfort.
             </p>
             <p className="mt-4 text-muted-foreground">
-              We cover Code 1, 8, 10 and 14 licences, learner&apos;s licence preparation with full
-              study material, and shuttle transport to lessons and tests. Our secure online platform
-              lets you book lessons, track your progress and pay without carrying cash.
+              We run airport transfers, corporate shuttles, event transport and inter-city routes
+              across South Africa. Our secure online platform lets you book a ride, track your
+              driver live and pay without carrying cash.
             </p>
             <ul className="mt-6 grid gap-2 sm:grid-cols-2">
               {[
-                "Certified instructors",
-                "Roadworthy vehicles",
+                "Vetted, professional drivers",
+                "Roadworthy, comfortable vehicles",
                 "Online booking & payments",
-                "Progress tracking",
-                "Study guides & practice tests",
-                "Shuttle & transport",
+                "Live ride tracking",
+                "Fixed route pricing",
+                "24/7 airport transfers",
               ].map((i) => (
                 <li key={i} className="flex items-center gap-2 text-sm">
                   <CheckCircle2 className="h-4 w-4 text-primary" /> {i}
@@ -96,14 +99,21 @@ function About() {
               <Link to="/services">Explore our services</Link>
             </Button>
           </div>
-          <img
-            src={heroImg}
-            alt="Instructor and learner in a driving lesson"
-            className="aspect-[4/3] w-full rounded-xl object-cover shadow-strong"
-            width={1600}
-            height={1100}
-            loading="lazy"
-          />
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-strong">
+            <img
+              src={heroImg}
+              alt="NJ Shuttle Services vehicle and driver"
+              className="h-full w-full object-cover"
+              width={1600}
+              height={1100}
+              loading="lazy"
+            />
+            <img
+              src={logoBadge}
+              alt="NJ Shuttle Services badge"
+              className="absolute bottom-4 right-4 h-16 w-16 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.45)] ring-2 ring-white/90 sm:h-20 sm:w-20"
+            />
+          </div>
         </div>
       </section>
 

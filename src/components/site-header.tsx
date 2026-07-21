@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Phone } from "lucide-react";
-import logo from "../assets/logo1.jpeg";
+import logo from "../assets/logo-b.png";
 import { contactInfo } from "../data/site";
 import { Button } from "../components/ui/button";
 
@@ -22,7 +22,7 @@ export function SiteHeader() {
           <img
             src={logo}
             alt="Nthlakusani & Jama Driving School logo"
-            className="h-10 w-10 shrink-0"
+            className="h-10 w-10 shrink-0 rounded-full object-cover border-2 border-primary"
             width={40}
             height={40}
           />
@@ -31,7 +31,7 @@ export function SiteHeader() {
               Nthlakusani &amp; Jama
             </p>
             <p className="truncate text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
-              Driving School &amp; Shuttle
+               Shuttle Services
             </p>
           </div>
         </Link>

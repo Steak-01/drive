@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, Mail, MapPin } from "lucide-react";
-import logo from "../assets/logo1.jpeg";
+import logo from "../assets/logo-b.png";
 import { contactInfo } from "../data/site";
 
 export function SiteFooter() {
@@ -10,13 +10,12 @@ export function SiteFooter() {
         <div className="lg:col-span-1">
           <div className="flex items-center gap-3">
             <img
-              src={logo}
-              alt="Logo"
-              className="h-11 w-11"
-              width={44}
-              height={44}
-              loading="lazy"
-            />
+            src={logo}
+            alt="Nthlakusani & Jama Driving School logo"
+            className="h-10 w-10 shrink-0 rounded-full object-cover border-2 border-primary"
+            width={40}
+            height={40}
+          />
             <div className="leading-tight">
               <p className="font-display text-lg font-bold uppercase">Nthlakusani &amp; Jama</p>
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">

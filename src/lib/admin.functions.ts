@@ -115,10 +115,11 @@ export const adminListBookings = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("../integrations/supabase/client.server");
 
-    const { data: bookings } = await supabaseAdmin
+    const { data: bookings, error: bookingsErr } = await supabaseAdmin
       .from("bookings")
       .select("*")
       .order("created_at", { ascending: false });
+    if (bookingsErr) throw new Error(`adminListBookings: ${bookingsErr.message}`);
     const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name");
     const { data: packages } = await supabaseAdmin.from("packages").select("id, code, title");
     const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
