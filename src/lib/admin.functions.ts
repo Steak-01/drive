@@ -10,16 +10,6 @@ interface AdminContext {
   supabase: SupabaseClient<Database>;
 }
 
-/*type AdminContext = {
-  userId: string;
-  supabase: {
-    rpc: (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{ data: boolean | null; error: { message: string } | null }>;
-  };
-};*/
-
 async function assertAdmin(context: AdminContext) {
   const { data: isAdmin, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
@@ -44,11 +34,13 @@ export interface AdminBooking {
   student_email: string | null;
   package_code: string | null;
   package_title: string | null;
-  instructor_id: string | null;
-  instructor_name: string | null;
-  lessons_count: number;
-  amount_cents: number;
-  scheduled_at: string | null;
+  pickup_location: string | null;
+  dropoff_location: string | null;
+  trip_date: string | null;
+  passenger_count: number;
+  amount_cents: number | null;
+  quoted_at: string | null;
+  quoted_by: string | null;
   status: string;
   payment_status: string;
   notes: string | null;
@@ -92,7 +84,7 @@ export const adminSetRole = createServerFn({ method: "POST" })
     z
       .object({
         userId: z.string().uuid(),
-        role: z.enum(["student", "instructor", "admin"]),
+        role: z.enum(["student", "admin"]),
         action: z.enum(["add", "remove"]),
       })
       .parse(d),
@@ -142,11 +134,13 @@ export const adminListBookings = createServerFn({ method: "GET" })
       student_email: emailMap.get(b.student_id) ?? null,
       package_code: b.package_id ? (pkgMap.get(b.package_id)?.code ?? null) : null,
       package_title: b.package_id ? (pkgMap.get(b.package_id)?.title ?? null) : null,
-      instructor_id: b.instructor_id,
-      instructor_name: b.instructor_id ? (nameMap.get(b.instructor_id) ?? null) : null,
-      lessons_count: b.lessons_count,
+      pickup_location: b.pickup_location,
+      dropoff_location: b.dropoff_location,
+      trip_date: b.trip_date,
+      passenger_count: b.passenger_count,
       amount_cents: b.amount_cents,
-      scheduled_at: b.scheduled_at,
+      quoted_at: b.quoted_at,
+      quoted_by: b.quoted_by,
       status: b.status,
       payment_status: b.payment_status,
       notes: b.notes,
@@ -157,39 +151,29 @@ export const adminListBookings = createServerFn({ method: "GET" })
     }));
   });
 
-export const adminListInstructors = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ id: string; full_name: string | null }[]> => {
-    await assertAdmin(context);
-    const { supabaseAdmin } = await import("../integrations/supabase/client.server");
-    const { data: roleRows } = await supabaseAdmin
-      .from("user_roles")
-      .select("user_id")
-      .eq("role", "instructor");
-    const ids = (roleRows ?? []).map((r) => r.user_id);
-    if (ids.length === 0) return [];
-    const { data: profiles } = await supabaseAdmin
-      .from("profiles")
-      .select("id, full_name")
-      .in("id", ids);
-    return (profiles ?? []).map((p) => ({ id: p.id, full_name: p.full_name }));
-  });
-
 export const adminUpdateBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator(
     (d: {
       bookingId: string;
-      instructorId?: string | null;
       status?: string;
-      scheduled_at?: string | null;
+      tripDate?: string | null;
+      pickupLocation?: string | null;
+      dropoffLocation?: string | null;
+      passengerCount?: number;
+      notes?: string | null;
     }) =>
       z
         .object({
           bookingId: z.string().uuid(),
-          instructorId: z.string().uuid().nullable().optional(),
-          status: z.enum(["pending", "confirmed", "completed", "cancelled"]).optional(),
-          scheduled_at: z.string().nullable().optional(),
+          status: z
+            .enum(["pending_quote", "quoted", "confirmed", "completed", "cancelled"])
+            .optional(),
+          tripDate: z.string().nullable().optional(),
+          pickupLocation: z.string().max(300).nullable().optional(),
+          dropoffLocation: z.string().max(300).nullable().optional(),
+          passengerCount: z.number().min(1).optional(),
+          notes: z.string().max(2000).nullable().optional(),
         })
         .parse(d),
   )
@@ -197,11 +181,67 @@ export const adminUpdateBooking = createServerFn({ method: "POST" })
     await assertAdmin(context);
     // Run as the authenticated admin so the booking trigger recognises the
     // caller as privileged (auth.uid() = admin) and does not revert changes.
-    const patch: { instructor_id?: string | null; status?: string; scheduled_at?: string | null } =
-      {};
-    if (data.instructorId !== undefined) patch.instructor_id = data.instructorId;
+    const patch: {
+      status?: string;
+      trip_date?: string | null;
+      pickup_location?: string | null;
+      dropoff_location?: string | null;
+      passenger_count?: number;
+      notes?: string | null;
+    } = {};
     if (data.status !== undefined) patch.status = data.status;
-    if (data.scheduled_at !== undefined) patch.scheduled_at = data.scheduled_at;
+    if (data.tripDate !== undefined) patch.trip_date = data.tripDate;
+    if (data.pickupLocation !== undefined) patch.pickup_location = data.pickupLocation;
+    if (data.dropoffLocation !== undefined) patch.dropoff_location = data.dropoffLocation;
+    if (data.passengerCount !== undefined) patch.passenger_count = data.passengerCount;
+    if (data.notes !== undefined) patch.notes = data.notes;
+    const { error } = await context.supabase
+      .from("bookings")
+      .update(patch)
+      .eq("id", data.bookingId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/**
+ * Admin sets or updates the price quote for a booking. `quoted_at` and
+ * `quoted_by` are always stamped server-side from the authenticated admin —
+ * never taken from client input. On the first quote, status advances from
+ * pending_quote to quoted automatically.
+ */
+export const adminSetBookingQuote = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((d: { bookingId: string; amountCents: number }) =>
+    z
+      .object({
+        bookingId: z.string().uuid(),
+        amountCents: z.number().int().min(0),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    // Run as the authenticated admin so the booking trigger recognises the
+    // caller as privileged and applies the quote instead of reverting it.
+    const { data: existing, error: fetchErr } = await context.supabase
+      .from("bookings")
+      .select("status")
+      .eq("id", data.bookingId)
+      .maybeSingle();
+    if (fetchErr) throw new Error(fetchErr.message);
+
+    const patch: {
+      amount_cents: number;
+      quoted_at: string;
+      quoted_by: string;
+      status?: string;
+    } = {
+      amount_cents: data.amountCents,
+      quoted_at: new Date().toISOString(),
+      quoted_by: context.userId,
+    };
+    if (existing?.status === "pending_quote") patch.status = "quoted";
+
     const { error } = await context.supabase
       .from("bookings")
       .update(patch)
@@ -257,53 +297,6 @@ export const adminReviewPayment = createServerFn({ method: "POST" })
       .eq("id", data.bookingId);
     if (error) throw new Error(error.message);
     return { ok: true };
-  });
-
-/**
- * Admin creates a new instructor account: provisions the auth user (email
- * confirmed), seeds their profile, and grants the `instructor` role.
- */
-export const adminCreateInstructor = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator((d: { email: string; password: string; fullName: string; phone?: string }) =>
-    z
-      .object({
-        email: z.string().trim().email().max(255),
-        password: z.string().min(8).max(72),
-        fullName: z.string().trim().min(1).max(120),
-        phone: z.string().trim().max(40).optional(),
-      })
-      .parse(d),
-  )
-  .handler(async ({ data, context }): Promise<{ userId: string }> => {
-    await assertAdmin(context);
-    const { supabaseAdmin } = await import("../integrations/supabase/client.server");
-
-    const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
-      email: data.email,
-      password: data.password,
-      email_confirm: true,
-      user_metadata: { full_name: data.fullName },
-    });
-    if (createErr || !created?.user) {
-      throw new Error(createErr?.message ?? "Could not create instructor");
-    }
-    const newId = created.user.id;
-
-    const { error: profileErr } = await supabaseAdmin
-      .from("profiles")
-      .upsert(
-        { id: newId, full_name: data.fullName, phone: data.phone ?? null },
-        { onConflict: "id" },
-      );
-    if (profileErr) throw new Error(profileErr.message);
-
-    const { error: roleErr } = await supabaseAdmin
-      .from("user_roles")
-      .upsert({ user_id: newId, role: "instructor" }, { onConflict: "user_id,role" });
-    if (roleErr) throw new Error(roleErr.message);
-
-    return { userId: newId };
   });
 
 export const adminCreateAdmin = createServerFn({ method: "POST" })

@@ -5,12 +5,11 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   adminListUsers,
   adminListBookings,
-  adminListInstructors,
   adminSetRole,
   adminUpdateBooking,
+  adminSetBookingQuote,
   adminGetProofUrl,
   adminReviewPayment,
-  adminCreateInstructor,
   adminCreateAdmin,
   adminListInquiries,
   adminUpdateInquiry,
@@ -49,42 +48,42 @@ import {
   Clock,
   UserPlus,
   Mail,
+  Tag,
 } from "lucide-react";
 import { Textarea } from "../../components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "Admin — Driving School Dashboard" }] }),
+  head: () => ({ meta: [{ title: "Admin — Shuttle Dashboard" }] }),
   component: AdminDashboard,
 });
 
 const ROLES: AppRole[] = ["student", "admin"];
-const STATUS_FILTERS = ["all", "pending", "confirmed", "completed", "cancelled"] as const;
+const STATUS_FILTERS = [
+  "all",
+  "pending_quote",
+  "quoted",
+  "confirmed",
+  "completed",
+  "cancelled",
+] as const;
 type StatusFilter = (typeof STATUS_FILTERS)[number];
 
 function AdminDashboard() {
   const queryClient = useQueryClient();
   const listUsers = useServerFn(adminListUsers);
   const listBookings = useServerFn(adminListBookings);
-  const listInstructors = useServerFn(adminListInstructors);
   const setRole = useServerFn(adminSetRole);
   const updateBooking = useServerFn(adminUpdateBooking);
+  const setBookingQuote = useServerFn(adminSetBookingQuote);
   const getProofUrl = useServerFn(adminGetProofUrl);
   const reviewPayment = useServerFn(adminReviewPayment);
-  const createInstructor = useServerFn(adminCreateInstructor);
   const createAdmin = useServerFn(adminCreateAdmin);
   const listInquiries = useServerFn(adminListInquiries);
   const updateInquiry = useServerFn(adminUpdateInquiry);
 
   const [bookingFilter, setBookingFilter] = useState<StatusFilter>("all");
   const [userSearch, setUserSearch] = useState("");
-  const [addOpen, setAddOpen] = useState(false);
   const [addAdminOpen, setAddAdminOpen] = useState(false);
-  const [newInstructor, setNewInstructor] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    password: "",
-  });
   const [newAdmin, setNewAdmin] = useState({
     fullName: "",
     email: "",
@@ -94,10 +93,6 @@ function AdminDashboard() {
 
   const users = useQuery({ queryKey: ["admin-users"], queryFn: () => listUsers() });
   const bookings = useQuery({ queryKey: ["admin-bookings"], queryFn: () => listBookings() });
-  const instructors = useQuery({
-    queryKey: ["admin-instructors"],
-    queryFn: () => listInstructors(),
-  });
   const inquiries = useQuery({ queryKey: ["admin-inquiries"], queryFn: () => listInquiries() });
 
   const inquiryMutation = useMutation({
@@ -116,22 +111,8 @@ function AdminDashboard() {
     onSuccess: () => {
       toast.success("Roles updated");
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-instructors"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-
-  const createInstructorMutation = useMutation({
-    mutationFn: (input: { email: string; password: string; fullName: string; phone?: string }) =>
-      createInstructor({ data: input }),
-    onSuccess: () => {
-      toast.success("Instructor account created");
-      setAddOpen(false);
-      setNewInstructor({ fullName: "", email: "", phone: "", password: "" });
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-instructors"] });
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to create instructor"),
   });
 
   const createAdminMutation = useMutation({
@@ -146,14 +127,23 @@ function AdminDashboard() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to create admin"),
   });
 
-  const assignMutation = useMutation({
-    mutationFn: (input: { bookingId: string; instructorId?: string | null; status?: string }) =>
-      updateBooking({ data: input }),
+  const updateBookingMutation = useMutation({
+    mutationFn: (input: { bookingId: string; status?: string }) => updateBooking({ data: input }),
     onSuccess: () => {
       toast.success("Booking updated");
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const quoteMutation = useMutation({
+    mutationFn: (input: { bookingId: string; amountCents: number }) =>
+      setBookingQuote({ data: input }),
+    onSuccess: () => {
+      toast.success("Quote sent");
+      queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to set quote"),
   });
 
   const reviewMutation = useMutation({
@@ -184,15 +174,17 @@ function AdminDashboard() {
     const active = allBookings.filter((b) => b.status !== "cancelled");
     const revenue = allBookings
       .filter((b) => b.payment_status === "paid")
-      .reduce((sum, b) => sum + b.amount_cents, 0);
+      .reduce((sum, b) => sum + (b.amount_cents ?? 0), 0);
     const studentCount = allUsers.filter((u) => u.roles.includes("student")).length;
     const proofsToReview = allBookings.filter((b) => b.payment_status === "proof_submitted").length;
+    const pendingQuotes = allBookings.filter((b) => b.status === "pending_quote").length;
     return {
       bookings: active.length,
       users: allUsers.length,
       students: studentCount,
       revenue,
       proofsToReview,
+      pendingQuotes,
     };
   }, [allBookings, allUsers]);
 
@@ -212,11 +204,12 @@ function AdminDashboard() {
 
   return (
     <DashboardShell area="admin">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         <StatCard label="Active bookings" value={stats.bookings} icon={CalendarCheck} />
         <StatCard label="Total users" value={stats.users} icon={Users} />
         <StatCard label="Students" value={stats.students} icon={GraduationCap} />
         <StatCard label="Paid revenue" value={formatZAR(stats.revenue)} icon={Wallet} />
+        <StatCard label="Pending quotes" value={stats.pendingQuotes} icon={Tag} />
         <StatCard label="Payments to review" value={stats.proofsToReview} icon={Clock} />
         <StatCard
           label="New inquiries"
@@ -249,7 +242,7 @@ function AdminDashboard() {
                 className="capitalize"
                 onClick={() => setBookingFilter(f)}
               >
-                {f}
+                {f.replace("_", " ")}
               </Button>
             ))}
           </div>
@@ -258,130 +251,117 @@ function AdminDashboard() {
               {allBookings.length === 0 ? "No bookings yet." : "No bookings match this filter."}
             </p>
           )}
-          {filteredBookings.map((b) => (
-            <div key={b.id} className="rounded-xl border border-border bg-card p-5 shadow-card">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-display text-lg font-bold">
-                    {b.student_name || b.student_email || "Student"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {b.package_code ? `${b.package_code} — ${b.package_title}` : "Lesson"} ·{" "}
-                    {b.lessons_count} lesson{b.lessons_count > 1 ? "s" : ""} ·{" "}
-                    {formatZAR(b.amount_cents)}
-                  </p>
-                  {b.scheduled_at && (
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {new Date(b.scheduled_at).toLocaleString("en-ZA")}
+          {filteredBookings.map((b) => {
+            const route = [b.pickup_location, b.dropoff_location].filter(Boolean).join(" → ");
+            return (
+              <div key={b.id} className="rounded-xl border border-border bg-card p-5 shadow-card">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-display text-lg font-bold">
+                      {b.student_name || b.student_email || "Student"}
                     </p>
-                  )}
-                </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <StatusBadge value={b.status} />
-                  <StatusBadge value={b.payment_status} />
-                </div>
-              </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-semibold uppercase text-muted-foreground">
-                    Instructor
-                  </label>
-                  <Select
-                    value={b.instructor_id ?? "none"}
-                    onValueChange={(v) =>
-                      assignMutation.mutate({
-                        bookingId: b.id,
-                        instructorId: v === "none" ? null : v,
-                      })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Unassigned" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Unassigned</SelectItem>
-                      {(instructors.data ?? []).map((i) => (
-                        <SelectItem key={i.id} value={i.id}>
-                          {i.full_name || "Instructor"}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-xs font-semibold uppercase text-muted-foreground">
-                    Status
-                  </label>
-                  <Select
-                    value={b.status}
-                    onValueChange={(v) => assignMutation.mutate({ bookingId: b.id, status: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {(b.proof_of_payment_path || b.payment_status !== "unpaid") && (
-                <div className="mt-4 rounded-lg border border-border bg-muted/40 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs font-semibold uppercase text-muted-foreground">
-                        Proof of payment
+                    <p className="text-sm text-muted-foreground">
+                      {b.package_title ?? "Trip"}
+                      {route ? ` · ${route}` : ""} ·{" "}
+                      {b.passenger_count} passenger{b.passenger_count > 1 ? "s" : ""} ·{" "}
+                      {b.amount_cents != null ? formatZAR(b.amount_cents) : "Awaiting quote"}
+                    </p>
+                    {b.trip_date && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {new Date(b.trip_date).toLocaleString("en-ZA")}
                       </p>
-                      {b.payment_reference && <p className="text-sm">Ref: {b.payment_reference}</p>}
-                      {b.proof_submitted_at && (
-                        <p className="text-xs text-muted-foreground">
-                          Submitted {new Date(b.proof_submitted_at).toLocaleString("en-ZA")}
-                        </p>
-                      )}
-                    </div>
-                    {b.proof_of_payment_path && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => viewProof.mutate(b.id)}
-                        disabled={viewProof.isPending}
-                      >
-                        <Eye className="h-4 w-4" /> View proof
-                      </Button>
                     )}
                   </div>
-                  {b.payment_status === "proof_submitted" && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <Button
-                        variant="hero"
-                        size="sm"
-                        onClick={() =>
-                          reviewMutation.mutate({ bookingId: b.id, decision: "approve" })
-                        }
-                        disabled={reviewMutation.isPending}
-                      >
-                        <Check className="h-4 w-4" /> Approve &amp; activate
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          reviewMutation.mutate({ bookingId: b.id, decision: "reject" })
-                        }
-                        disabled={reviewMutation.isPending}
-                      >
-                        <X className="h-4 w-4" /> Reject
-                      </Button>
-                    </div>
-                  )}
+                  <div className="flex flex-col items-end gap-1.5">
+                    <StatusBadge value={b.status} />
+                    <StatusBadge value={b.payment_status} />
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <BookingQuoteForm
+                    bookingId={b.id}
+                    amountCents={b.amount_cents}
+                    onSubmit={quoteMutation.mutate}
+                    isPending={quoteMutation.isPending}
+                  />
+                  <div>
+                    <label className="text-xs font-semibold uppercase text-muted-foreground">
+                      Status
+                    </label>
+                    <Select
+                      value={b.status}
+                      onValueChange={(v) =>
+                        updateBookingMutation.mutate({ bookingId: b.id, status: v })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending_quote">Pending quote</SelectItem>
+                        <SelectItem value="quoted">Quoted</SelectItem>
+                        <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {(b.proof_of_payment_path || b.payment_status !== "unpaid") && (
+                  <div className="mt-4 rounded-lg border border-border bg-muted/40 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-xs font-semibold uppercase text-muted-foreground">
+                          Proof of payment
+                        </p>
+                        {b.payment_reference && <p className="text-sm">Ref: {b.payment_reference}</p>}
+                        {b.proof_submitted_at && (
+                          <p className="text-xs text-muted-foreground">
+                            Submitted {new Date(b.proof_submitted_at).toLocaleString("en-ZA")}
+                          </p>
+                        )}
+                      </div>
+                      {b.proof_of_payment_path && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => viewProof.mutate(b.id)}
+                          disabled={viewProof.isPending}
+                        >
+                          <Eye className="h-4 w-4" /> View proof
+                        </Button>
+                      )}
+                    </div>
+                    {b.payment_status === "proof_submitted" && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          variant="hero"
+                          size="sm"
+                          onClick={() =>
+                            reviewMutation.mutate({ bookingId: b.id, decision: "approve" })
+                          }
+                          disabled={reviewMutation.isPending}
+                        >
+                          <Check className="h-4 w-4" /> Approve &amp; activate
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            reviewMutation.mutate({ bookingId: b.id, decision: "reject" })
+                          }
+                          disabled={reviewMutation.isPending}
+                        >
+                          <X className="h-4 w-4" /> Reject
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </TabsContent>
 
         <TabsContent value="users" className="mt-5 space-y-3">
@@ -392,87 +372,6 @@ function AdminDashboard() {
               placeholder="Search by name, email or phone…"
               className="max-w-sm"
             />
-            <Dialog open={addOpen} onOpenChange={setAddOpen}>
-              <DialogTrigger asChild>
-                <Button variant="hero" size="sm">
-                  <UserPlus className="h-4 w-4" /> Add instructor
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add instructor</DialogTitle>
-                  <DialogDescription>
-                    Creates a new instructor account with the instructor role. Share these
-                    credentials with them so they can sign in.
-                  </DialogDescription>
-                </DialogHeader>
-                <form
-                  className="space-y-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    createInstructorMutation.mutate({
-                      fullName: newInstructor.fullName.trim(),
-                      email: newInstructor.email.trim(),
-                      password: newInstructor.password,
-                      phone: newInstructor.phone.trim() || undefined,
-                    });
-                  }}
-                >
-                  <div className="space-y-1.5">
-                    <Label htmlFor="inst-name">Full name</Label>
-                    <Input
-                      id="inst-name"
-                      required
-                      value={newInstructor.fullName}
-                      onChange={(e) =>
-                        setNewInstructor((s) => ({ ...s, fullName: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="inst-email">Email</Label>
-                    <Input
-                      id="inst-email"
-                      type="email"
-                      required
-                      value={newInstructor.email}
-                      onChange={(e) => setNewInstructor((s) => ({ ...s, email: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="inst-phone">Phone (optional)</Label>
-                    <Input
-                      id="inst-phone"
-                      value={newInstructor.phone}
-                      onChange={(e) => setNewInstructor((s) => ({ ...s, phone: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="inst-password">Temporary password</Label>
-                    <Input
-                      id="inst-password"
-                      type="text"
-                      required
-                      minLength={8}
-                      placeholder="At least 8 characters"
-                      value={newInstructor.password}
-                      onChange={(e) =>
-                        setNewInstructor((s) => ({ ...s, password: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      type="submit"
-                      variant="hero"
-                      disabled={createInstructorMutation.isPending}
-                    >
-                      {createInstructorMutation.isPending ? "Creating…" : "Create instructor"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
             <Dialog open={addAdminOpen} onOpenChange={setAddAdminOpen}>
               <DialogTrigger asChild>
                 <Button variant="hero" size="sm">
@@ -671,5 +570,49 @@ function AdminDashboard() {
         </TabsContent>
       </Tabs>
     </DashboardShell>
+  );
+}
+
+/** Inline quote entry/update for a single booking — local draft state per row. */
+function BookingQuoteForm({
+  bookingId,
+  amountCents,
+  onSubmit,
+  isPending,
+}: {
+  bookingId: string;
+  amountCents: number | null;
+  onSubmit: (input: { bookingId: string; amountCents: number }) => void;
+  isPending: boolean;
+}) {
+  const [value, setValue] = useState(amountCents != null ? (amountCents / 100).toFixed(2) : "");
+
+  return (
+    <form
+      className="flex flex-wrap items-end gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const rands = Number(value);
+        if (!Number.isFinite(rands) || rands < 0) return;
+        onSubmit({ bookingId, amountCents: Math.round(rands * 100) });
+      }}
+    >
+      <div className="flex-1 space-y-1.5">
+        <label className="text-xs font-semibold uppercase text-muted-foreground">
+          {amountCents != null ? "Update quote (R)" : "Set quote (R)"}
+        </label>
+        <Input
+          type="number"
+          min="0"
+          step="0.01"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="0.00"
+        />
+      </div>
+      <Button type="submit" variant="hero" size="sm" disabled={isPending || value === ""}>
+        {amountCents != null ? "Update" : "Send quote"}
+      </Button>
+    </form>
   );
 }

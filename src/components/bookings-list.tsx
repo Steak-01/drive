@@ -3,7 +3,7 @@ import { usePackages, useMyBookings } from "../hooks/use-student-data";
 import { StatusBadge, formatZAR } from "../components/dashboard-shell";
 import { Button } from "../components/ui/button";
 import { PaymentPanel } from "../components/payment-panel";
-import { TrendingUp, CalendarPlus } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 
 /** List of the student's bookings with payment + messaging. */
 export function BookingsList() {
@@ -15,41 +15,39 @@ export function BookingsList() {
     return (
       <div className="rounded-lg border border-dashed border-border p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          No bookings yet. Book your first driving lesson to get started.
+          No trips requested yet. Request your first trip to get started.
         </p>
         <Button asChild variant="hero" size="sm" className="mt-4">
           <Link to="/book">
-            <CalendarPlus className="h-4 w-4" /> Book a Lesson
+            <CalendarPlus className="h-4 w-4" /> Request a Trip
           </Link>
         </Button>
       </div>
     );
   }
 
-  console.log('packages:', packages);
-  console.log('pkgMap size:', pkgMap.size);
-
   return (
     <div className="space-y-3">
       {(bookings ?? []).map((b) => {
         const pkg = b.package_id ? pkgMap.get(b.package_id) : undefined;
-        console.log('booking package_ids:', bookings?.map(b => b.package_id));
-        console.log('sample pkg id:', packages?.[0]?.id, typeof packages?.[0]?.id);
-        console.log('sample booking package_id:', bookings?.[0]?.package_id, typeof bookings?.[0]?.package_id);
+        const route = [b.pickup_location, b.dropoff_location].filter(Boolean).join(" → ");
+
         return (
           <div key={b.id} className="rounded-xl border border-border bg-card p-5 shadow-card">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-display text-lg font-bold">
-                  {pkg ? `${pkg.code} — ${pkg.title}` : "Unknown package"}
+                  {pkg ? pkg.title : "Unknown trip type"}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {b.lessons_count} lesson{b.lessons_count > 1 ? "s" : ""} ·{" "}
-                  {formatZAR(b.amount_cents)}
+                  {route || "Locations to be confirmed"}
+                  {b.passenger_count
+                    ? ` · ${b.passenger_count} passenger${b.passenger_count > 1 ? "s" : ""}`
+                    : ""}
                 </p>
-                {b.scheduled_at && (
+                {b.trip_date && (
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {new Date(b.scheduled_at).toLocaleString("en-ZA")}
+                    {new Date(b.trip_date).toLocaleString("en-ZA")}
                   </p>
                 )}
               </div>
@@ -58,24 +56,24 @@ export function BookingsList() {
                 <StatusBadge value={b.payment_status} />
               </div>
             </div>
+
             {b.notes && (
               <p className="mt-3 border-t border-border pt-3 text-sm text-muted-foreground">
                 {b.notes}
               </p>
             )}
-            {b.instructor_notes && (
-              <div className="mt-3 rounded-lg border border-primary/30 bg-accent/40 p-3">
-                <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-primary">
-                  <TrendingUp className="h-3.5 w-3.5" /> Instructor progress notes
-                </p>
-                <p className="mt-1 text-sm text-foreground">{b.instructor_notes}</p>
+
+            {b.amount_cents != null ? (
+              <PaymentPanel
+                bookingId={b.id}
+                paymentStatus={b.payment_status}
+                amountLabel={formatZAR(b.amount_cents)}
+              />
+            ) : (
+              <div className="mt-3 rounded-lg border border-dashed border-border p-3 text-sm text-muted-foreground">
+                We'll notify you here once your trip has been quoted.
               </div>
             )}
-            <PaymentPanel
-              bookingId={b.id}
-              paymentStatus={b.payment_status}
-              amountLabel={formatZAR(b.amount_cents)}
-            />
           </div>
         );
       })}

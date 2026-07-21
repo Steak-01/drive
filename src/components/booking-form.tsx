@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "../integrations/supabase/client";
 import { useAccount } from "../hooks/use-account";
-import { formatZAR } from "../components/dashboard-shell";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -18,18 +16,18 @@ import {
 import { toast } from "sonner";
 import { Loader2, CalendarPlus } from "lucide-react";
 
-const NO_PREFERENCE = "none";
-const SA_OFFSET = "+02:00";
-
 interface Pkg {
   id: string;
   code: string;
   title: string;
-  per_lesson_cents: number;
   description: string;
 }
 
-/** Self-contained "Book a Lesson" form for students. */
+/**
+ * Self-contained "Request a Trip" form for students. No pricing is shown or
+ * collected here — every trip is quoted individually by an admin after the
+ * request comes in, so `amount_cents` is never set from the client.
+ */
 export function BookingForm({ onBooked }: { onBooked?: () => void }) {
   const { data: account } = useAccount();
   const queryClient = useQueryClient();
@@ -40,7 +38,7 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("packages")
-        .select("id, code, title, per_lesson_cents, description")
+        .select("id, code, title, description")
         .eq("active", true)
         .order("sort_order");
       if (error) throw error;
@@ -49,37 +47,42 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
   });
 
   const [packageId, setPackageId] = useState("");
-  const [lessons, setLessons] = useState(1);
-  const [date, setDate] = useState("");
+  const [pickupLocation, setPickupLocation] = useState("");
+  const [dropoffLocation, setDropoffLocation] = useState("");
+  const [tripDate, setTripDate] = useState("");
+  const [passengerCount, setPassengerCount] = useState(1);
   const [notes, setNotes] = useState("");
 
   const selected = packages?.find((p) => p.id === packageId);
-  const total = selected ? selected.per_lesson_cents * lessons : 0;
 
   const resetForm = () => {
     setNotes("");
-    setDate("");
-    setLessons(1);
+    setTripDate("");
+    setPickupLocation("");
+    setDropoffLocation("");
+    setPassengerCount(1);
     setPackageId("");
   };
 
   const createBooking = useMutation({
     mutationFn: async () => {
-      if (!userId || !selected) throw new Error("Select a package");
-      let scheduledAt: string | null = null;
+      if (!userId || !selected) throw new Error("Select a trip type");
 
       const { error } = await supabase.from("bookings").insert({
         student_id: userId,
         package_id: selected.id,
-        lessons_count: lessons,
-        amount_cents: selected.per_lesson_cents * lessons,
-        scheduled_at: scheduledAt,
+        pickup_location: pickupLocation || null,
+        dropoff_location: dropoffLocation || null,
+        trip_date: tripDate ? new Date(tripDate).toISOString() : null,
+        passenger_count: passengerCount,
         notes: notes || null,
+        // amount_cents is intentionally omitted — it stays NULL until an
+        // admin sets the quote; a student booking can never carry a price.
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Lesson booked! We'll confirm shortly.");
+      toast.success("Trip requested! We'll send you a quote shortly.");
       resetForm();
       queryClient.invalidateQueries({ queryKey: ["my-bookings", userId] });
       onBooked?.();
@@ -90,7 +93,7 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-card">
       <h2 className="flex items-center gap-2 font-display text-xl font-bold uppercase">
-        <CalendarPlus className="h-5 w-5 text-primary" /> Book a Lesson
+        <CalendarPlus className="h-5 w-5 text-primary" /> Request a Trip
       </h2>
       <form
         className="mt-5 space-y-4"
@@ -100,32 +103,68 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
         }}
       >
         <div className="space-y-1.5">
-          <Label>Licence package</Label>
+          <Label>Trip type</Label>
           <Select value={packageId} onValueChange={setPackageId}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose a package" />
+              <SelectValue placeholder="Choose a trip type" />
             </SelectTrigger>
             <SelectContent>
               {(packages ?? []).map((p) => (
                 <SelectItem key={p.id} value={p.id}>
-                  {p.code} — {p.title} ({formatZAR(p.per_lesson_cents)}/{p.description})
+                  {p.title}
+                  {p.description ? ` — ${p.description}` : ""}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="date">Preferred date</Label>
-          <Input
-            id="date"
-            type="date"
-            min={new Date().toISOString().slice(0, 10)}
-            value={date}
-            onChange={(e) => {
-              setDate(e.target.value);
-            }}
-          />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="pickup">Pickup location</Label>
+            <Input
+              id="pickup"
+              value={pickupLocation}
+              onChange={(e) => setPickupLocation(e.target.value)}
+              placeholder="e.g. Tsakane, Brakpan"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="dropoff">Drop-off location</Label>
+            <Input
+              id="dropoff"
+              value={dropoffLocation}
+              onChange={(e) => setDropoffLocation(e.target.value)}
+              placeholder="e.g. OR Tambo Airport"
+            />
+          </div>
         </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="tripDate">Trip date</Label>
+            <Input
+              id="tripDate"
+              type="date"
+              min={new Date().toISOString().slice(0, 10)}
+              value={tripDate}
+              onChange={(e) => setTripDate(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="passengers">Passengers</Label>
+            <Input
+              id="passengers"
+              type="number"
+              min={1}
+              value={passengerCount}
+              onChange={(e) =>
+                setPassengerCount(Math.max(1, Number(e.target.value) || 1))
+              }
+            />
+          </div>
+        </div>
+
         <div className="space-y-1.5">
           <Label htmlFor="notes">Notes (optional)</Label>
           <Textarea
@@ -136,22 +175,16 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
             rows={3}
           />
         </div>
-        {selected && (
-          <div className="flex items-center justify-between rounded-lg bg-accent px-4 py-3">
-            <span className="text-sm font-semibold">Estimated total</span>
-            <span className="font-display text-lg font-bold text-primary">
-              {formatZAR(total)}
-            </span>
-          </div>
-        )}
+
+        <div className="rounded-lg bg-accent px-4 py-3 text-sm text-muted-foreground">
+          We'll review your request and send you a price quote before confirming.
+        </div>
+
         <Button
           type="submit"
           variant="hero"
           className="w-full"
-          disabled={
-            createBooking.isPending ||
-            !selected
-          }
+          disabled={createBooking.isPending || !selected}
         >
           {createBooking.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           Request Booking

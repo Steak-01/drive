@@ -10,57 +10,63 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
-          amount_cents: number;
+          amount_cents: number | null;
           created_at: string;
+          dropoff_location: string | null;
           id: string;
-          instructor_id: string | null;
-          instructor_notes: string | null;
-          lessons_count: number;
           notes: string | null;
           package_id: string | null;
+          passenger_count: number;
           payment_reference: string | null;
           payment_status: string;
+          pickup_location: string | null;
           proof_of_payment_path: string | null;
           proof_submitted_at: string | null;
-          scheduled_at: string | null;
+          quoted_at: string | null;
+          quoted_by: string | null;
           status: string;
           student_id: string;
+          trip_date: string | null;
           updated_at: string;
         };
         Insert: {
-          amount_cents?: number;
+          amount_cents?: number | null;
           created_at?: string;
+          dropoff_location?: string | null;
           id?: string;
-          instructor_id?: string | null;
-          instructor_notes?: string | null;
-          lessons_count?: number;
           notes?: string | null;
           package_id?: string | null;
+          passenger_count?: number;
           payment_reference?: string | null;
           payment_status?: string;
+          pickup_location?: string | null;
           proof_of_payment_path?: string | null;
           proof_submitted_at?: string | null;
-          scheduled_at?: string | null;
+          quoted_at?: string | null;
+          quoted_by?: string | null;
           status?: string;
           student_id: string;
+          trip_date?: string | null;
           updated_at?: string;
         };
         Update: {
-          amount_cents?: number;
+          amount_cents?: number | null;
           created_at?: string;
+          dropoff_location?: string | null;
           id?: string;
-          instructor_id?: string | null;
-          instructor_notes?: string | null;
-          lessons_count?: number;
           notes?: string | null;
           package_id?: string | null;
+          passenger_count?: number;
           payment_reference?: string | null;
           payment_status?: string;
+          pickup_location?: string | null;
           proof_of_payment_path?: string | null;
           proof_submitted_at?: string | null;
-          scheduled_at?: string | null;
+          quoted_at?: string | null;
+          quoted_by?: string | null;
           status?: string;
           student_id?: string;
+          trip_date?: string | null;
           updated_at?: string;
         };
         Relationships: [
@@ -112,39 +118,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      instructor_availability: {
-        Row: {
-          active: boolean;
-          created_at: string;
-          day_of_week: number;
-          end_time: string;
-          id: string;
-          instructor_id: string;
-          start_time: string;
-          updated_at: string;
-        };
-        Insert: {
-          active?: boolean;
-          created_at?: string;
-          day_of_week: number;
-          end_time: string;
-          id?: string;
-          instructor_id: string;
-          start_time: string;
-          updated_at?: string;
-        };
-        Update: {
-          active?: boolean;
-          created_at?: string;
-          day_of_week?: number;
-          end_time?: string;
-          id?: string;
-          instructor_id?: string;
-          start_time?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
       messages: {
         Row: {
           body: string;
@@ -187,7 +160,6 @@ export type Database = {
           created_at: string;
           description: string | null;
           id: string;
-          per_lesson_cents: number;
           sort_order: number;
           title: string;
         };
@@ -197,7 +169,6 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: string;
-          per_lesson_cents: number;
           sort_order?: number;
           title: string;
         };
@@ -207,7 +178,6 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: string;
-          per_lesson_cents?: number;
           sort_order?: number;
           title?: string;
         };
@@ -236,36 +206,6 @@ export type Database = {
           full_name?: string | null;
           id?: string;
           phone?: string | null;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      student_skills: {
-        Row: {
-          created_at: string;
-          id: string;
-          instructor_id: string | null;
-          level: number;
-          skill_key: string;
-          student_id: string;
-          updated_at: string;
-        };
-        Insert: {
-          created_at?: string;
-          id?: string;
-          instructor_id?: string | null;
-          level?: number;
-          skill_key: string;
-          student_id: string;
-          updated_at?: string;
-        };
-        Update: {
-          created_at?: string;
-          id?: string;
-          instructor_id?: string | null;
-          level?: number;
-          skill_key?: string;
-          student_id?: string;
           updated_at?: string;
         };
         Relationships: [];
@@ -311,11 +251,9 @@ export type Database = {
         };
         Returns: boolean;
       };
-      instructor_of_student: { Args: { _student_id: string }; Returns: boolean };
-
     };
     Enums: {
-      app_role: "student" | "instructor" | "admin";
+      app_role: "student" | "admin";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -441,7 +379,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["student", "instructor", "admin"],
+      app_role: ["student", "admin"],
     },
   },
 } as const;

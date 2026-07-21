@@ -92,7 +92,7 @@ function AuthPage() {
     setErrorMsg(null);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -101,8 +101,18 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created! continue to sign in.");
-        await afterAuth();
+
+        if (data.session) {
+          // Email confirmation is disabled on this project, so signUp already
+          // returned an active session — safe to bootstrap and continue.
+          toast.success("Account created!");
+          await afterAuth();
+        } else {
+         
+          toast.success("Account created! Check your email to confirm it, then sign in.");
+          setMode("signin");
+          setPassword("");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;

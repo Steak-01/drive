@@ -15,34 +15,39 @@ function StudentDashboard() {
 
   const progress = useMemo(() => {
     const all = bookings ?? [];
+
     const completed = all.filter((b) => b.status === "completed").length;
+
     const upcoming = all.filter(
       (b) =>
-        b.scheduled_at &&
-        new Date(b.scheduled_at).getTime() > Date.now() &&
+        b.trip_date &&
+        new Date(b.trip_date).getTime() > Date.now() &&
         b.status !== "cancelled" &&
         b.status !== "completed",
     );
-    const totalLessons = all
-      .filter((b) => b.status !== "cancelled")
-      .reduce((sum, b) => sum + b.lessons_count, 0);
+
+    // "lessons_count" doesn't exist on the bookings table — the closest
+    // real signal is the number of non-cancelled bookings themselves.
+    const totalBookings = all.filter((b) => b.status !== "cancelled").length;
+
     const nextLesson =
       upcoming
         .slice()
         .sort(
-          (a, b) => new Date(a.scheduled_at!).getTime() - new Date(b.scheduled_at!).getTime(),
-        )[0]?.scheduled_at ?? null;
-    return { completed, totalLessons, upcoming: upcoming.length, nextLesson };
+          (a, b) => new Date(a.trip_date!).getTime() - new Date(b.trip_date!).getTime(),
+        )[0]?.trip_date ?? null;
+
+    return { completed, totalBookings, upcoming: upcoming.length, nextLesson };
   }, [bookings]);
 
   return (
     <DashboardShell area="student">
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Booked lessons" value={progress.totalLessons} icon={GraduationCap} />
+        <StatCard label="Booked trips" value={progress.totalBookings} icon={GraduationCap} />
         <StatCard label="Completed" value={progress.completed} icon={CheckCircle2} />
         <StatCard label="Upcoming" value={progress.upcoming} icon={CalendarClock} />
         <StatCard
-          label="Next lesson"
+          label="Next trip"
           value={
             progress.nextLesson
               ? new Date(progress.nextLesson).toLocaleDateString("en-ZA", {

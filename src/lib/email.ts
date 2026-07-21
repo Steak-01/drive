@@ -50,9 +50,12 @@ export async function sendAdminBookingNotification(options: {
   packageCode: string | null;
   packageTitle: string | null;
   lessonsCount: number;
-  scheduledAt: string | null;
-  instructorName: string | null;
+  scheduledAt?: string | null;
   notes: string | null;
+  pickupLocation: string | null,
+  dropoffLocation: string | null,
+  tripDate: string | null,
+  passengerCount: number,
 }) {
   const from = getFromAddress();
   const to = getAdminAddress();
@@ -64,7 +67,6 @@ export async function sendAdminBookingNotification(options: {
     `Package: ${options.packageCode ?? "Unknown"} ${options.packageTitle ?? ""}`.trim(),
     `Lessons: ${options.lessonsCount}`,
     `Preferred time: ${options.scheduledAt ?? "Not specified"}`,
-    `Instructor: ${options.instructorName ?? "No preference"}`,
     `Notes: ${options.notes ?? "None"}`,
   ];
 

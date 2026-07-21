@@ -6,29 +6,31 @@ export interface StudentPkg {
   id: string;
   code: string;
   title: string;
-  per_lesson_cents: number;
+  description: string | null;
 }
 
 export interface StudentBooking {
   id: string;
   package_id: string | null;
-  lessons_count: number;
-  amount_cents: number;
-  scheduled_at: string | null;
+  pickup_location: string | null;
+  dropoff_location: string | null;
+  trip_date: string | null;
+  passenger_count: number;
+  amount_cents: number | null;
+  quoted_at: string | null;
   status: string;
   payment_status: string;
   notes: string | null;
-  instructor_notes: string | null;
 }
 
-/** Active licence packages (shared cache). */
+/** Active trip-category packages (shared cache). */
 export function usePackages() {
   return useQuery({
     queryKey: ["packages"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("packages")
-        .select("id, code, title, per_lesson_cents")
+        .select("id, code, title, description")
         .eq("active", true)
         .order("sort_order");
       if (error) throw error;
@@ -48,7 +50,7 @@ export function useMyBookings() {
       const { data, error } = await supabase
         .from("bookings")
         .select(
-          "id, package_id, lessons_count, amount_cents, scheduled_at, status, payment_status, notes, instructor_notes",
+          "id, package_id, pickup_location, dropoff_location, trip_date, passenger_count, amount_cents, quoted_at, status, payment_status, notes",
         )
         .order("created_at", { ascending: false });
       if (error) throw error;
