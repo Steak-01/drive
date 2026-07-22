@@ -1,35 +1,37 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Car,
-  GraduationCap,
   ShieldCheck,
   CalendarClock,
-  BookOpen,
   Bus,
   CheckCircle2,
   ArrowRight,
   Star,
   Award,
   Users,
+  Tag,
+  Plane,
+  MapPin,
+  Compass,
+  Palmtree,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { services, learnersLicence, contactInfo } from "../data/site";
+import { contactInfo } from "../data/site";
 import heroImg from "../assets/logo2.png";
 import fleetImg from "../assets/fleet.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nthlakusani & Jama Driving School & Shuttle Services" },
+      { title: "NJ Shuttle Services" },
       {
         name: "description",
         content:
-          "Learn to drive with confidence. Code 1, 8, 10 & 14 lessons, learner's licence prep and shuttle services. We Drive You Forward!",
+          "Airport transfers, corporate shuttles, event transport and inter-city routes across South Africa. Kings of Comfort, Choose Wisely.",
       },
-      { property: "og:title", content: "Nthlakusani & Jama Driving School & Shuttle Services" },
+      { property: "og:title", content: "NJ Shuttle Services" },
       {
         property: "og:description",
-        content: "Professional driving lessons, learner's licence prep and shuttle services.",
+        content: "Professional shuttle transport with transparent, upfront quotes.",
       },
     ],
   }),
@@ -39,59 +41,86 @@ export const Route = createFileRoute("/")({
 const features = [
   {
     icon: ShieldCheck,
-    title: "Patient, Certified Instructors",
-    text: "Friendly professionals who teach drivers of all ages and skill levels.",
+    title: "Vetted, Professional Drivers",
+    text: "Background-checked drivers and roadworthy vehicles on every trip.",
   },
   {
     icon: CalendarClock,
-    title: "Flexible Scheduling",
-    text: "Book lessons online and pick time slots that fit your week.",
+    title: "Easy Online Booking",
+    text: "Request a trip in minutes and track its status from your account.",
   },
   {
-    icon: BookOpen,
-    title: "Study Material & Practice Tests",
-    text: "Everything you need to pass the theory and learner's exam.",
+    icon: Tag,
+    title: "Transparent Quotes",
+    text: "Every trip is priced individually — no guesswork, no hidden fees.",
   },
   {
     icon: Bus,
-    title: "Shuttle & Transport",
-    text: "Reliable transport to your test and lessons, included where applicable.",
+    title: "Airport, Local & Day Trips",
+    text: "From airport transfers to full vacation transport, we've got the route covered.",
+  },
+];
+
+const tripTypes = [
+  {
+    code: "airport",
+    icon: Plane,
+    title: "Airport Trips",
+    text: "Reliable transfers to and from the airport, timed to your flight.",
+  },
+  {
+    code: "local",
+    icon: MapPin,
+    title: "Local Trips",
+    text: "Getting around town — appointments, events, errands and more.",
+  },
+  {
+    code: "day_trip",
+    icon: Compass,
+    title: "1 Day Trips",
+    text: "Single-day out-of-town trips, there and back in comfort.",
+  },
+  {
+    code: "vacation",
+    icon: Palmtree,
+    title: "Vacations",
+    text: "Multi-day vacation transport for you, your family or your group.",
   },
 ];
 
 const steps = [
   {
     n: "01",
-    title: "Register & Book",
-    text: "Create an account and choose your licence code and lesson package.",
+    title: "Request & Quote",
+    text: "Tell us your trip details — pickup, drop-off and dates — and we'll send you a quote.",
   },
   {
     n: "02",
-    title: "Learn & Track",
-    text: "Train with your instructor and track your progress toward the test.",
+    title: "Confirm & Pay",
+    text: "Accept your quote and pay securely online — no cash needed.",
   },
   {
     n: "03",
-    title: "Pass & Drive",
-    text: "Hire a vehicle for test day and get your licence. We drive you forward!",
+    title: "Ride & Relax",
+    text: "Sit back — our professional drivers get you there safely and on time.",
   },
 ];
 
 const testimonials = [
   {
     name: "Lerato M.",
-    role: "Code 8 Graduate",
-    text: "Passed first time! The instructors were patient and the practice tests made the theory so easy.",
+    role: "Airport Transfer Customer",
+    text: "Booked my airport transfer online and got a quote back within the hour. Driver was on time and so professional.",
   },
   {
     name: "Sipho D.",
-    role: "Code 10 Learner",
-    text: "Booking online and tracking my lessons kept me on schedule. Highly professional team.",
+    role: "Corporate Shuttle Client",
+    text: "We use them for all our staff transport now. Reliable, on time, every time.",
   },
   {
     name: "Naledi K.",
-    role: "Learner's Licence",
-    text: "They sorted my study material and transport. Stress-free from start to finish.",
+    role: "Vacation Trip Customer",
+    text: "They organised transport for our whole family trip. Stress-free from start to finish.",
   },
 ];
 
@@ -106,11 +135,11 @@ function Home() {
               <Award className="h-3.5 w-3.5 text-primary" /> {contactInfo.since}
             </span>
             <h1 className="mt-5 font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl lg:text-6xl">
-              Learn to Drive with <span className="text-primary">Confidence</span>
+              Get There Safely, <span className="text-primary">In Comfort</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-white/80">
-              Professional driving lessons, learner&apos;s licence preparation and shuttle services.
-              Code 1, 8, 10 &amp; 14 — taught by certified instructors who put your safety first.
+              Airport transfers, corporate shuttles, event transport and inter-city routes across
+              South Africa — with vetted, professional drivers who put your safety first.
             </p>
             <p className="mt-4 font-display text-2xl font-bold text-primary">
               {contactInfo.tagline}
@@ -118,18 +147,18 @@ function Home() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild variant="hero" size="xl">
                 <Link to="/contact">
-                  Book a Lesson <ArrowRight className="h-4 w-4" />
+                  Book a Trip <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outlineLight" size="xl">
-                <Link to="/services">View Pricing</Link>
+                <Link to="/services">Our Services</Link>
               </Button>
             </div>
             <div className="mt-10 grid grid-cols-3 gap-4 border-t border-white/15 pt-6">
               {[
                 { icon: Users, stat: "All ages", label: "Welcome" },
-                { icon: Car, stat: "4 Codes", label: "Licences" },
-                { icon: Star, stat: "First-time", label: "Pass focus" },
+                { icon: MapPin, stat: "4 Trip Types", label: "Coverage" },
+                { icon: Star, stat: "5-Star", label: "Service" },
               ].map((s) => (
                 <div key={s.label}>
                   <s.icon className="h-5 w-5 text-primary" />
@@ -143,7 +172,7 @@ function Home() {
           <div className="relative">
             <img
               src={heroImg}
-              alt="Driving instructor teaching a learner driver"
+              alt="NJ Shuttle Services driver and vehicle"
               className="h-full w-full rounded-xl object-cover"
               width={1600}
               height={1100}
@@ -164,7 +193,7 @@ function Home() {
               Why choose us
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold uppercase sm:text-4xl">
-              Built for safe, confident drivers
+              Built for safe, comfortable trips
             </h2>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -193,66 +222,35 @@ function Home() {
                 Our services
               </p>
               <h2 className="mt-2 font-display text-3xl font-bold uppercase sm:text-4xl">
-                Licence codes &amp; pricing
+                Trip types we cover
               </h2>
             </div>
             <Button asChild variant="outline">
               <Link to="/services">
-                Full price list <ArrowRight className="h-4 w-4" />
+                See all trip types <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
           </div>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {services.map((s) => (
+            {tripTypes.map((t) => (
               <div
-                key={s.code}
-                className={`relative flex flex-col rounded-xl border bg-card p-6 shadow-card ${
-                  s.featured ? "border-primary ring-1 ring-primary" : "border-border"
-                }`}
+                key={t.code}
+                className="flex flex-col rounded-xl border border-border bg-card p-6 shadow-card"
               >
-                {s.featured && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
-                    Most popular
-                  </span>
-                )}
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-primary" />
-                  <span className="font-display text-lg font-bold uppercase">{s.code}</span>
+                  <t.icon className="h-5 w-5 text-primary" />
+                  <span className="font-display text-lg font-bold uppercase">{t.title}</span>
                 </div>
-                <p className="mt-1 text-sm font-semibold text-foreground">{s.title}</p>
-                <p className="mt-3 font-display text-3xl font-bold text-primary">
-                  {s.perLesson}
-                  <span className="text-sm font-semibold text-muted-foreground"> / lesson</span>
+                <p className="mt-3 flex-1 text-sm text-muted-foreground">{t.text}</p>
+                <p className="mt-4 text-sm font-semibold text-primary">
+                  Get a personalised quote
                 </p>
-                <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
-                  {s.bundles.map((b) => (
-                    <li key={b.label} className="flex justify-between">
-                      <span>{b.label}</span>
-                      <span className="font-semibold text-foreground">{b.price}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button asChild variant="dark" className="mt-6 w-full">
-                  <Link to="/contact">Book {s.code}</Link>
+                <Button asChild variant="dark" className="mt-4 w-full">
+                  <Link to="/contact">Request a quote</Link>
                 </Button>
               </div>
             ))}
-          </div>
-
-          <div className="mt-6 flex flex-col items-start justify-between gap-4 rounded-xl border border-border bg-card p-6 shadow-card sm:flex-row sm:items-center">
-            <div>
-              <h3 className="font-display text-xl font-bold uppercase">{learnersLicence.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{learnersLicence.description}</p>
-            </div>
-            <div className="text-left sm:text-right">
-              <p className="font-display text-3xl font-bold text-primary">
-                {learnersLicence.price}
-              </p>
-              <p className="text-xs font-semibold uppercase text-muted-foreground">
-                Study material + transport
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -265,7 +263,7 @@ function Home() {
               How it works
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold uppercase sm:text-4xl">
-              From booking to licence
+              From request to ride
             </h2>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -280,11 +278,11 @@ function Home() {
         </div>
       </section>
 
-      {/* Fleet / shuttle band */}
+      {/* Fleet band */}
       <section className="relative overflow-hidden">
         <img
           src={fleetImg}
-          alt="Driving school fleet and shuttle"
+          alt="NJ Shuttle Services fleet"
           className="h-full w-full object-cover"
           width={1600}
           height={900}
@@ -296,14 +294,14 @@ function Home() {
             <div className="max-w-lg text-white">
               <Bus className="h-8 w-8 text-primary" />
               <h2 className="mt-4 font-display text-3xl font-bold uppercase sm:text-4xl">
-                Shuttle &amp; Transport Services
+                Our Fleet
               </h2>
               <p className="mt-3 text-white/80">
-                Safe, reliable transport to your lessons and test venue. Vehicle hire available for
-                test day across all licence codes.
+                Comfortable, roadworthy vehicles maintained to a high standard — because how you
+                travel matters as much as where you're going.
               </p>
               <Button asChild variant="hero" size="lg" className="mt-6">
-                <Link to="/contact">Enquire about transport</Link>
+                <Link to="/contact">Get a quote</Link>
               </Button>
             </div>
           </div>
@@ -318,7 +316,7 @@ function Home() {
               Testimonials
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold uppercase sm:text-4xl">
-              Trusted by our learners
+              Trusted by our customers
             </h2>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -349,27 +347,29 @@ function Home() {
       <section className="bg-gradient-red text-primary-foreground">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-16 text-center sm:px-6 lg:px-8">
           <h2 className="font-display text-3xl font-bold uppercase sm:text-4xl">
-            Ready to get on the road?
+            Ready to get moving?
           </h2>
           <p className="max-w-xl text-white/90">
             Join now and lock in the opening special — the first 10 customers save R150–R200.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild variant="dark" size="xl">
-              <Link to="/contact">Book a Lesson</Link>
+              <Link to="/contact">Book a Trip</Link>
             </Button>
             <Button asChild variant="outlineLight" size="xl">
-              <Link to="/portal">Student Portal</Link>
+              <Link to="/portal">My Account</Link>
             </Button>
           </div>
           <ul className="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/90">
-            {["No cash needed — pay online", "Flexible time slots", "Study material included"].map(
-              (i) => (
-                <li key={i} className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4" /> {i}
-                </li>
-              ),
-            )}
+            {[
+              "No cash needed — pay online",
+              "Flexible booking, any time",
+              "Transparent, upfront quotes",
+            ].map((i) => (
+              <li key={i} className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4" /> {i}
+              </li>
+            ))}
           </ul>
         </div>
       </section>

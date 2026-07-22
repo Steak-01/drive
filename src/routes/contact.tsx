@@ -15,22 +15,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { contactInfo, services } from "../data/site";
+import { contactInfo } from "../data/site";
 import { submitInquiry } from "../lib/inquiries.functions";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact & Book — Nthlakusani & Jama Driving School" },
+      { title: "Contact & Book — NJ Shuttle Services" },
       {
         name: "description",
         content:
-          "Contact Nthlakusani & Jama Driving School & Shuttle Services to book a lesson. Call 061 580 6437 or 083 268 7425.",
+          "Contact NJ Shuttle Services to book a trip. Call 061 580 6437 or 083 268 7425.",
       },
-      { property: "og:title", content: "Contact & Book — Nthlakusani & Jama Driving School" },
+      { property: "og:title", content: "Contact & Book — NJ Shuttle Services" },
       {
         property: "og:description",
-        content: "Book a lesson or enquire about transport and vehicle hire.",
+        content: "Book a trip or enquire about transport and vehicle hire.",
       },
     ],
   }),
@@ -62,11 +62,11 @@ function Contact() {
             Contact &amp; Book
           </p>
           <h1 className="mt-2 font-display text-4xl font-bold uppercase sm:text-5xl">
-            Let&apos;s get you driving
+            Let&apos;s get you there
           </h1>
           <p className="mt-4 max-w-2xl text-white/80">
-            Send us a message to book a lesson, request transport or ask a question. We&apos;ll get
-            back to you quickly.
+            Send us a message to book a trip, ask about corporate or event transport, or get a
+            quote. We&apos;ll get back to you quickly.
           </p>
         </div>
       </section>
@@ -149,7 +149,7 @@ function Contact() {
                   });
                 }}
               >
-                <h2 className="font-display text-2xl font-bold uppercase">Book a lesson</h2>
+                <h2 className="font-display text-2xl font-bold uppercase">Book a trip</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="grid gap-1.5">
                     <Label htmlFor="name">Full name</Label>
@@ -179,19 +179,17 @@ function Contact() {
                   />
                 </div>
                 <div className="grid gap-1.5">
-                  <Label htmlFor="service">Service of interest</Label>
+                  <Label htmlFor="service">Trip type</Label>
                   <Select value={service} onValueChange={setService}>
                     <SelectTrigger id="service">
-                      <SelectValue placeholder="Select a service" />
+                      <SelectValue placeholder="Select a trip type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="learners">Learner&apos;s Licence</SelectItem>
-                      {services.map((s) => (
-                        <SelectItem key={s.code} value={s.code}>
-                          {s.code} — {s.title}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="transport">Shuttle / Transport</SelectItem>
+                      <SelectItem value="airport">Airport Trips</SelectItem>
+                      <SelectItem value="local">Local Trips</SelectItem>
+                      <SelectItem value="day_trip">1 Day Trips</SelectItem>
+                      <SelectItem value="vacation">Vacations</SelectItem>
+                      <SelectItem value="other">Something else</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -202,7 +200,7 @@ function Contact() {
                     name="message"
                     rows={4}
                     maxLength={1000}
-                    placeholder="Tell us your preferred days/times and any questions."
+                    placeholder="Tell us your pickup/drop-off, dates and any questions."
                   />
                 </div>
                 <Button type="submit" variant="hero" size="lg" disabled={mutation.isPending}>

@@ -1,20 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GraduationCap, ClipboardList, ShieldCheck, Lock, ArrowRight } from "lucide-react";
+import { User, ShieldCheck, Lock, ArrowRight } from "lucide-react";
 import { Button } from "../components/ui/button";
 
 export const Route = createFileRoute("/portal")({
   head: () => ({
     meta: [
-      { title: "Secure Portals — Nthlakusani & Jama Driving School" },
+      { title: "Secure Portal — NJ Shuttle Services" },
       {
         name: "description",
         content:
-          "Secure student, instructor and admin portals for booking lessons, tracking progress and managing operations.",
+          "Secure customer and admin portals for booking trips, getting quotes and managing operations.",
       },
-      { property: "og:title", content: "Secure Portals — Nthlakusani & Jama Driving School" },
+      { property: "og:title", content: "Secure Portal — NJ Shuttle Services" },
       {
         property: "og:description",
-        content: "Login-first dashboards for students, instructors and admins.",
+        content: "Login-first dashboards for customers and admins.",
       },
     ],
   }),
@@ -23,14 +23,14 @@ export const Route = createFileRoute("/portal")({
 
 const portals = [
   {
-    icon: GraduationCap,
-    title: "Student Portal",
-    text: "Browse and book lessons, view your schedule, track progress toward your test and access study guides and practice tests.",
+    icon: User,
+    title: "My Account",
+    text: "Request trips, view your quotes and bookings, upload proof of payment and track your ride status — all in one place.",
   },
   {
     icon: ShieldCheck,
     title: "Admin Portal",
-    text: "Create courses, assign instructors, run financial reports and handle inquiries from one secure dashboard.",
+    text: "Review trip requests, send quotes, manage bookings and handle customer inquiries from one secure dashboard.",
   },
 ];
 
@@ -46,12 +46,12 @@ function Portal() {
             Your Dashboard, Your Way
           </h1>
           <p className="mt-4 text-muted-foreground">
-            Login-first dashboards for students, instructors and administrators. Secure accounts,
-            online booking and payments are coming soon — enable them in one step.
+            Login-first dashboards for customers and administrators — request trips, get quotes
+            and manage payments securely online.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mx-auto mt-12 grid max-w-3xl gap-6 md:grid-cols-2">
           {portals.map((p) => (
             <div
               key={p.title}
@@ -69,8 +69,8 @@ function Portal() {
         <div className="mt-12 rounded-xl border border-primary bg-accent/40 p-8 text-center ring-1 ring-primary">
           <h2 className="font-display text-2xl font-bold uppercase">Your secure portal is live</h2>
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
-            Create an account or sign in to book lessons, track your progress and manage everything
-            online. Instructors and admins get their own dashboards too.
+            Create an account or sign in to request trips, track your quotes and bookings, and
+            manage everything online. Admins get their own dashboard too.
           </p>
           <Button asChild variant="hero" size="lg" className="mt-6">
             <Link to="/auth">
