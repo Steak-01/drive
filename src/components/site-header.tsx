@@ -55,7 +55,7 @@ export function SiteHeader() {
             <Link to="/auth">Sign In</Link>
           </Button>
           <Button asChild variant="hero" size="sm">
-            <Link to="/contact">Book a Lesson</Link>
+            <Link to="/book">Book a Lesson</Link>
           </Button>
         </div>
 

@@ -17,7 +17,8 @@ import {
 import { Button } from "../components/ui/button";
 import { contactInfo } from "../data/site";
 import heroImg from "../assets/logo2.png";
-import fleetImg from "../assets/fleet.jpg";
+import fleetImg from "../assets/private.jpeg";
+import Img from '../assets/8seater.jpeg'
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -279,34 +280,75 @@ function Home() {
       </section>
 
       {/* Fleet band */}
-      <section className="relative overflow-hidden">
+     <section className="relative overflow-hidden bg-secondary py-16 sm:py-20">
+  <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-2xl text-center text-white">
+      <Bus className="mx-auto h-8 w-8 text-primary" />
+      <h2 className="mt-4 font-display text-3xl font-bold uppercase sm:text-4xl">
+        Our Fleet
+      </h2>
+    </div>
+
+    <div className="mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
+      <Link
+        to="/book"
+        className="group relative block overflow-hidden rounded-xl"
+      >
         <img
           src={fleetImg}
-          alt="NJ Shuttle Services fleet"
-          className="h-full w-full object-cover"
-          width={1600}
-          height={900}
+          alt="Private sedan"
+          className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          width={800}
+          height={600}
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/85 to-secondary/40" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="max-w-lg text-white">
-              <Bus className="h-8 w-8 text-primary" />
-              <h2 className="mt-4 font-display text-3xl font-bold uppercase sm:text-4xl">
-                Our Fleet
-              </h2>
-              <p className="mt-3 text-white/80">
-                Comfortable, roadworthy vehicles maintained to a high standard — because how you
-                travel matters as much as where you're going.
-              </p>
-              <Button asChild variant="hero" size="lg" className="mt-6">
-                <Link to="/contact">Get a quote</Link>
-              </Button>
-            </div>
-          </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/20 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <p className="font-display text-lg font-bold uppercase text-white">
+            Private Sedan
+          </p>
+          <p className="mt-1 text-sm text-white/80">
+            Book this vehicle &rarr;
+          </p>
         </div>
-      </section>
+      </Link>
+
+      <Link
+        to="/book"
+        className="group relative block overflow-hidden rounded-xl"
+      >
+        <img
+          src={Img}
+          alt="8-seater van"
+          className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          width={800}
+          height={600}
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/20 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <p className="font-display text-lg font-bold uppercase text-white">
+            8-Seater Van
+          </p>
+          <p className="mt-1 text-sm text-white/80">
+            Book this vehicle &rarr;
+          </p>
+        </div>
+      </Link>
+    </div>
+
+    <p className="mx-auto mt-8 max-w-2xl text-center text-white/80">
+      Comfortable, roadworthy vehicles maintained to a high standard — because how you
+      travel matters as much as where you're going.
+    </p>
+
+    <div className="mt-6 text-center">
+      <Button asChild variant="hero" size="lg">
+        <Link to="/contact">Get a quote</Link>
+      </Button>
+    </div>
+  </div>
+</section>
 
       {/* Testimonials */}
       <section className="section-pad bg-muted/50">
@@ -354,7 +396,7 @@ function Home() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild variant="dark" size="xl">
-              <Link to="/contact">Book a Trip</Link>
+              <Link to="/book">Book a Trip</Link>
             </Button>
             <Button asChild variant="outlineLight" size="xl">
               <Link to="/portal">My Account</Link>

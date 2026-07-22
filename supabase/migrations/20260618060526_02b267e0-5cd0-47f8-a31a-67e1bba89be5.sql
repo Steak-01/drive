@@ -41,24 +41,49 @@ AS $$
 $$;
 
 -- ===== Packages (trip categories — no pricing here; every trip is quoted individually) =====
-CREATE TABLE public.packages (
+  CREATE TABLE public.packages (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    code text NOT NULL,
+    title text NOT NULL,
+    description text,
+    sort_order integer NOT NULL DEFAULT 0,
+    active boolean NOT NULL DEFAULT true,
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  GRANT SELECT ON public.packages TO anon, authenticated;
+  GRANT ALL ON public.packages TO service_role;
+  ALTER TABLE public.packages ENABLE ROW LEVEL SECURITY;
+
+  INSERT INTO public.packages (code, title, description, sort_order) VALUES
+    ('airport',  'Airport Trips', 'Transfers to and from the airport', 1),
+    ('local',    'Local Trips',   'Trips within the local area',       2),
+    ('day_trip', '1 Day Trips',   'Single-day out-of-town trips',      3),
+    ('vacation', 'Vacations',     'Multi-day vacation transport',      4);
+
+    CREATE TABLE public.vehicle_types (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  code text NOT NULL,
-  title text NOT NULL,
+  code text NOT NULL UNIQUE,        -- e.g. 'private_sedan', '8_seater'
+  name text NOT NULL,               -- e.g. 'Private Sedan', '8-Seater Van'
+  capacity integer,                 -- number of passengers
   description text,
   sort_order integer NOT NULL DEFAULT 0,
   active boolean NOT NULL DEFAULT true,
   created_at timestamptz NOT NULL DEFAULT now()
 );
-GRANT SELECT ON public.packages TO anon, authenticated;
-GRANT ALL ON public.packages TO service_role;
-ALTER TABLE public.packages ENABLE ROW LEVEL SECURITY;
 
-INSERT INTO public.packages (code, title, description, sort_order) VALUES
-  ('airport',  'Airport Trips', 'Transfers to and from the airport', 1),
-  ('local',    'Local Trips',   'Trips within the local area',       2),
-  ('day_trip', '1 Day Trips',   'Single-day out-of-town trips',      3),
-  ('vacation', 'Vacations',     'Multi-day vacation transport',      4);
+GRANT SELECT ON public.vehicle_types TO anon, authenticated;
+GRANT ALL ON public.vehicle_types TO service_role;
+ALTER TABLE public.vehicle_types ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "vehicle_types_select_active"
+  ON public.vehicle_types
+  FOR SELECT
+  TO anon, authenticated
+  USING (active = true);
+
+INSERT INTO public.vehicle_types (code, name, capacity, description, sort_order) VALUES
+  ('private_sedan', 'Private Sedan', 4, 'Private car for individuals or small groups', 1),
+  ('8_seater',      '8-Seater Van',  8, 'Shared or private van for larger groups', 2);
 
 -- ===== Bookings =====
 -- status flow: pending_quote -> quoted -> confirmed -> completed (or cancelled at any point)

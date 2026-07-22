@@ -28,6 +28,7 @@ export type Database = {
           student_id: string;
           trip_date: string | null;
           updated_at: string;
+          vehicle_type_id: string | null;
         };
         Insert: {
           amount_cents?: number | null;
@@ -48,6 +49,7 @@ export type Database = {
           student_id: string;
           trip_date?: string | null;
           updated_at?: string;
+          vehicle_type_id?: string | null;
         };
         Update: {
           amount_cents?: number | null;
@@ -68,6 +70,7 @@ export type Database = {
           student_id?: string;
           trip_date?: string | null;
           updated_at?: string;
+          vehicle_type_id?: string | null;
         };
         Relationships: [
           {
@@ -75,6 +78,13 @@ export type Database = {
             columns: ["package_id"];
             isOneToOne: false;
             referencedRelation: "packages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bookings_vehicle_type_id_fkey";
+            columns: ["vehicle_type_id"];
+            isOneToOne: false;
+            referencedRelation: "vehicle_types";
             referencedColumns: ["id"];
           },
         ];
@@ -228,6 +238,39 @@ export type Database = {
           id?: string;
           role?: Database["public"]["Enums"]["app_role"];
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      vehicle_types: {
+        Row: {
+          active: boolean;
+          capacity: number | null;
+          code: string;
+          created_at: string;
+          description: string | null;
+          id: string;
+          name: string;
+          sort_order: number;
+        };
+        Insert: {
+          active?: boolean;
+          capacity?: number | null;
+          code: string;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          name: string;
+          sort_order?: number;
+        };
+        Update: {
+          active?: boolean;
+          capacity?: number | null;
+          code?: string;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          sort_order?: number;
         };
         Relationships: [];
       };

@@ -23,6 +23,13 @@ interface Pkg {
   description: string;
 }
 
+interface VehicleType {
+  id: string;
+  code: string;
+  name: string;
+  capacity: number | null;
+}
+
 /**
  * Self-contained "Request a Trip" form for students. No pricing is shown or
  * collected here — every trip is quoted individually by an admin after the
@@ -46,7 +53,21 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
     },
   });
 
+  const { data: vehicleTypes } = useQuery({
+    queryKey: ["vehicle-types"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("vehicle_types")
+        .select("id, code, name, capacity")
+        .eq("active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return data as VehicleType[];
+    },
+  });
+
   const [packageId, setPackageId] = useState("");
+  const [vehicleTypeId, setVehicleTypeId] = useState("");
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropoffLocation, setDropoffLocation] = useState("");
   const [tripDate, setTripDate] = useState("");
@@ -62,6 +83,7 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
     setDropoffLocation("");
     setPassengerCount(1);
     setPackageId("");
+    setVehicleTypeId("");
   };
 
   const createBooking = useMutation({
@@ -71,6 +93,7 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
       const { error } = await supabase.from("bookings").insert({
         student_id: userId,
         package_id: selected.id,
+        vehicle_type_id: vehicleTypeId || null,
         pickup_location: pickupLocation || null,
         dropoff_location: dropoffLocation || null,
         trip_date: tripDate ? new Date(tripDate).toISOString() : null,
@@ -113,6 +136,23 @@ export function BookingForm({ onBooked }: { onBooked?: () => void }) {
                 <SelectItem key={p.id} value={p.id}>
                   {p.title}
                   {p.description ? ` — ${p.description}` : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>Vehicle type</Label>
+          <Select value={vehicleTypeId} onValueChange={setVehicleTypeId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Choose a vehicle type" />
+            </SelectTrigger>
+            <SelectContent>
+              {(vehicleTypes ?? []).map((v) => (
+                <SelectItem key={v.id} value={v.id}>
+                  {v.name}
+                  {v.capacity ? ` (${v.capacity} seats)` : ""}
                 </SelectItem>
               ))}
             </SelectContent>

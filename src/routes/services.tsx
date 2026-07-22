@@ -1,26 +1,70 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Truck, Bus, GraduationCap, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Plane, MapPin, Compass, Palmtree } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { services, learnersLicence } from "../data/site";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
-      { title: "Services & Pricing — Nthlakusani & Jama Driving School" },
+      { title: "Services & Pricing — NJ Shuttle Services" },
       {
         name: "description",
         content:
-          "Driving lesson pricing for Code 1, 8, 10 & 14, learner's licence prep, vehicle hire and transport. Bundles and per-lesson rates.",
+          "Airport transfers, local trips, day trips and vacation transport — every trip individually quoted, with no hidden fees.",
       },
-      { property: "og:title", content: "Services & Pricing — Nthlakusani & Jama Driving School" },
+      { property: "og:title", content: "Services & Pricing — NJ Shuttle Services" },
       {
         property: "og:description",
-        content: "Transparent pricing for all licence codes and shuttle services.",
+        content: "Transparent, upfront quotes for every shuttle trip type.",
       },
     ],
   }),
   component: Services,
 });
+
+const tripTypes = [
+  {
+    code: "airport",
+    icon: Plane,
+    title: "Airport Trips",
+    text: "Transfers to and from the airport, timed to your flight.",
+  },
+  {
+    code: "local",
+    icon: MapPin,
+    title: "Local Trips",
+    text: "Trips within the local area — appointments, events and errands.",
+  },
+  {
+    code: "day_trip",
+    icon: Compass,
+    title: "1 Day Trips",
+    text: "Single-day out-of-town trips, there and back in comfort.",
+  },
+  {
+    code: "vacation",
+    icon: Palmtree,
+    title: "Vacations",
+    text: "Multi-day vacation transport for you, your family or your group.",
+  },
+];
+
+const pricingSteps = [
+  {
+    n: "01",
+    title: "Tell us your trip",
+    text: "Pickup, drop-off, date and passenger count.",
+  },
+  {
+    n: "02",
+    title: "Get your quote",
+    text: "We review the details and send a transparent price — no hidden fees.",
+  },
+  {
+    n: "03",
+    title: "Confirm & pay",
+    text: "Accept the quote and pay securely online — no cash needed.",
+  },
+];
 
 function Services() {
   return (
@@ -34,103 +78,66 @@ function Services() {
             Clear, honest pricing
           </h1>
           <p className="mt-4 max-w-2xl text-white/80">
-            All driving codes, learner&apos;s licence preparation, vehicle hire and transport — with
-            no hidden fees. First 10 customers get R150–R200 off.
+            Airport transfers, local trips, day trips and vacation transport — every trip is
+            quoted individually, with no hidden fees. First 10 customers get R150–R200 off.
           </p>
+          <ul className="mt-6 grid max-w-lg grid-cols-2 gap-2">
+            {[
+              "No hidden fees",
+              "Transparent, upfront quotes",
+              "Pay securely online",
+              "Professional, vetted drivers",
+            ].map((i) => (
+              <li key={i} className="flex items-center gap-2 text-sm text-white/90">
+                <CheckCircle2 className="h-4 w-4 text-primary" /> {i}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      {/* Learner's licence */}
+      {/* How pricing works */}
       <section className="section-pad">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-start justify-between gap-6 rounded-xl border border-primary bg-accent/40 p-8 ring-1 ring-primary sm:flex-row sm:items-center">
-            <div className="max-w-xl">
-              <div className="flex items-center gap-2">
-                <GraduationCap className="h-6 w-6 text-primary" />
-                <h2 className="font-display text-2xl font-bold uppercase">
-                  {learnersLicence.title}
-                </h2>
+          <h2 className="font-display text-3xl font-bold uppercase">How pricing works</h2>
+          <p className="mt-2 max-w-2xl text-muted-foreground">
+            Every trip is different, so we don&apos;t publish a fixed price list — tell us your
+            trip details and we&apos;ll send you a transparent, upfront quote before you pay
+            anything.
+          </p>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {pricingSteps.map((s) => (
+              <div key={s.n} className="rounded-xl border border-border bg-card p-7 shadow-card">
+                <span className="font-display text-5xl font-bold text-primary/20">{s.n}</span>
+                <h3 className="mt-2 font-display text-xl font-bold uppercase">{s.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{s.text}</p>
               </div>
-              <p className="mt-2 text-muted-foreground">{learnersLicence.description}</p>
-              <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                {learnersLicence.includes.map((i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary" /> {i}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="text-left sm:text-right">
-              <p className="font-display text-4xl font-bold text-primary">
-                {learnersLicence.price}
-              </p>
-              <Button asChild variant="hero" className="mt-4">
-                <Link to="/contact">Book learner&apos;s</Link>
-              </Button>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Driving codes */}
+      {/* Trip types */}
       <section className="section-pad pt-0">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-bold uppercase">Driving lesson packages</h2>
+          <h2 className="font-display text-3xl font-bold uppercase">Trip types we cover</h2>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {services.map((s) => (
+            {tripTypes.map((t) => (
               <div
-                key={s.code}
-                className={`flex flex-col rounded-xl border bg-card p-7 shadow-card ${
-                  s.featured ? "border-primary ring-1 ring-primary" : "border-border"
-                }`}
+                key={t.code}
+                className="flex flex-col rounded-xl border border-border bg-card p-7 shadow-card"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-display text-2xl font-bold uppercase">{s.code}</span>
-                    <p className="text-sm font-semibold text-muted-foreground">{s.title}</p>
-                  </div>
-                  {s.featured && (
-                    <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
-                      Most popular
-                    </span>
-                  )}
+                <div className="flex items-center gap-2">
+                  <t.icon className="h-6 w-6 text-primary" />
+                  <span className="font-display text-2xl font-bold uppercase">{t.title}</span>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{s.subtitle}</p>
-
-                <div className="mt-5 flex items-baseline gap-1">
-                  <span className="font-display text-4xl font-bold text-primary">
-                    {s.perLesson}
-                  </span>
-                  <span className="text-sm font-semibold text-muted-foreground">/ lesson</span>
-                </div>
-
-                <dl className="mt-5 divide-y divide-border rounded-lg border border-border">
-                  {s.bundles.map((b) => (
-                    <div
-                      key={b.label}
-                      className="flex items-center justify-between px-4 py-2.5 text-sm"
-                    >
-                      <dt className="text-muted-foreground">{b.label}</dt>
-                      <dd className="font-bold">{b.price}</dd>
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                    <dt className="flex items-center gap-2 text-muted-foreground">
-                      <Truck className="h-4 w-4" /> {s.hire.label}
-                    </dt>
-                    <dd className="font-bold">{s.hire.price}</dd>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                    <dt className="flex items-center gap-2 text-muted-foreground">
-                      <Bus className="h-4 w-4" /> Transport
-                    </dt>
-                    <dd className="font-bold">{s.transport}</dd>
-                  </div>
-                </dl>
-
-                <Button asChild variant="dark" className="mt-6 w-full">
+                <p className="mt-2 flex-1 text-sm text-muted-foreground">{t.text}</p>
+                <p className="mt-5 text-sm font-semibold text-primary">
+                  Priced per trip — get a free quote in minutes
+                </p>
+                <Button asChild variant="dark" className="mt-4 w-full">
                   <Link to="/contact">
-                    Book {s.code} <ArrowRight className="h-4 w-4" />
+                    Request a quote <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -138,17 +145,18 @@ function Services() {
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground">
-            Prices include study material and transportation where indicated. Vehicle hire applies
-            to test day. Contact us to confirm availability and the opening-special discount.
+            Contact us to confirm availability, trip details and the opening-special discount.
           </p>
         </div>
       </section>
 
       <section className="bg-gradient-red text-primary-foreground">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 py-14 text-center sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl font-bold uppercase">Not sure which package?</h2>
+          <h2 className="font-display text-3xl font-bold uppercase">
+            Not sure which trip type fits?
+          </h2>
           <p className="max-w-xl text-white/90">
-            Talk to our team and we&apos;ll recommend the right plan for you.
+            Talk to our team and we&apos;ll recommend the right option for you.
           </p>
           <Button asChild variant="dark" size="xl">
             <Link to="/contact">Contact us</Link>
