@@ -198,6 +198,7 @@ function Contact() {
                   <Textarea
                     id="message"
                     name="message"
+                    required
                     rows={4}
                     maxLength={1000}
                     placeholder="Tell us your pickup/drop-off, dates and any questions."
