@@ -8,6 +8,14 @@ export interface ServicePackage {
   transport: string;
   featured?: boolean;
 }
+export const bankingDetails = {
+  bank: "Capitec",
+  accountHolder: "T Someone",
+  accountNumber: "1914671946",
+  branchCode: "40016",
+  reference: "Booking (Code Type)",
+  note: "Use your booking's licence code as the payment reference, then upload your proof of payment below. Your plan activates once an admin approves it.",
+};
 
 export const contactInfo = {
   name: "Nthlakusani & Jama Driving School & Shuttle Services",
