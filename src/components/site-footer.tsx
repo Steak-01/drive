@@ -24,8 +24,7 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="mt-4 max-w-xs text-sm text-secondary-foreground/70">
-            Driving School &amp; Shuttle Services. Professional lessons, learner&apos;s licence
-            prep, and safe transport.
+           Shuttle Services. Professional and safe transport.
           </p>
           <p className="mt-4 font-display text-xl font-bold text-primary">{contactInfo.tagline}</p>
         </div>
@@ -57,7 +56,7 @@ export function SiteFooter() {
             </li>
             <li>
               <Link to="/portal" className="hover:text-primary">
-                Student / Instructor Portal
+                Student Portal
               </Link>
             </li>
           </ul>
@@ -95,7 +94,7 @@ export function SiteFooter() {
             ))}
             <li className="flex items-start gap-2 pt-1">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <span>115 Paul Kruger(Regus Building), floor 2, office 220</span>
+              <span>115 Paul Kruger Street, Pretoria Central</span>
             </li>
           </ul>
         </div>
@@ -103,7 +102,7 @@ export function SiteFooter() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 py-5 text-center text-xs text-secondary-foreground/50 sm:px-6 lg:px-8">
-          © {new Date().getFullYear()} Nthlakusani &amp; Jama Driving School &amp; Shuttle Services.
+          © {new Date().getFullYear()} Nthlakusani &amp; Jama Shuttle Services.
           All rights reserved.
         </div>
       </div>
