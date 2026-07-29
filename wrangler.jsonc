@@ -1,0 +1,8 @@
+{
+  "name": "drive",
+  "compatibility_date": "2026-07-29",
+
+  "vars": {
+    "APP_ENV": "production"
+  }
+}
