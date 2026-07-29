@@ -5,6 +5,6 @@
 
   "vars": {
     "APP_ENV": "production",
-    "SUPABASE_URL": "https://ccqvzjedlmckinxyudfd.supabase.co",
+    "SUPABASE_URL": "https://ccqvzjedlmckinxyudfd.supabase.co"
   }
 }
