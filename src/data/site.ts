@@ -23,8 +23,9 @@ export const contactInfo = {
   tagline: "We Drive You Forward!",
   since: "Since 2026",
   phones: [
-    { label: "Calls", number: "0645569752", tel: "+27645569752" },
-    { label: "Personal line", number: "0813230184", tel: "+27813230184" },
+    { label: "Calls", number: "064 556 9752", tel: "+27645569752" },
+    { label: "Personal line", number: "081 323 0184", tel: "+27813230184" },
+    { label: "Landline", number: "12 140 0291", tel: "" },
   ],
   emails: [" info@njshuttleservice.co.za"],
 };
