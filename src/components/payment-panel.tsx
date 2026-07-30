@@ -128,7 +128,7 @@ export function PaymentPanel({
             id={`ref-${bookingId}`}
             value={reference}
             onChange={(e) => setReference(e.target.value)}
-            placeholder="e.g. Code 8 — J. Dlamini"
+            placeholder="Airport trip"
             maxLength={120}
           />
         </div>

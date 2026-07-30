@@ -158,7 +158,7 @@ export function ScheduleCalendar({
         </p>
         <div className="mt-2 space-y-2">
           {eventsForSelected.length === 0 && (
-            <p className="text-sm text-muted-foreground">No lessons scheduled.</p>
+            <p className="text-sm text-muted-foreground">No Rides scheduled.</p>
           )}
           {eventsForSelected.map((e) => (
             <div key={e.id} className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2">

@@ -10,11 +10,11 @@ export interface ServicePackage {
 }
 export const bankingDetails = {
   bank: "Capitec",
-  accountHolder: "T Someone",
-  accountNumber: "1914671946",
-  branchCode: "40016",
-  reference: "Booking (Code Type)",
-  note: "Use your booking's licence code as the payment reference, then upload your proof of payment below. Your plan activates once an admin approves it.",
+  accountHolder: "NJ Services",
+  accountNumber: "1055441999",
+  branchCode: "470010q",
+  reference: "Booking (Trip Type)",
+  note: "Use your booking's Trip type as the payment reference, then upload your proof of payment below. Your plan activates once an admin approves it.",
 };
 
 export const contactInfo = {
