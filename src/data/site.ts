@@ -12,7 +12,7 @@ export const bankingDetails = {
   bank: "Capitec",
   accountHolder: "NJ Driving School & Shuttle Services",
   accountNumber: "1055441999",
-  branchCode: "470010q",
+  branchCode: "470010",
   reference: "Booking (Trip Type)",
   note: "Use your booking's Trip type as the payment reference, then upload your proof of payment below. Your plan activates once an admin approves it.",
 };
