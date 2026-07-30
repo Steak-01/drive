@@ -12,13 +12,14 @@ import {
   GraduationCap,
   CalendarPlus,
   CalendarClock,
+  Car,
 } from "lucide-react";
 
 type NavLink = { to: string; label: string; icon: typeof LayoutDashboard };
 
 const STUDENT_LINKS: NavLink[] = [
-  { to: "/dashboard", label: "My Lessons", icon: GraduationCap },
-  { to: "/book", label: "Book a Lesson", icon: CalendarPlus },
+  { to: "/dashboard", label: "My Rides", icon: Car },
+  { to: "/book", label: "Book a Ride", icon: CalendarPlus },
   { to: "/schedule", label: "Schedule", icon: CalendarClock }
 ];
 

@@ -23,8 +23,8 @@ export const contactInfo = {
   tagline: "We Drive You Forward!",
   since: "Since 2026",
   phones: [
-    { label: "Calls", number: "0813230184", tel: "+27813230184" },
-    { label: "WhatsApp", number: "0762207592", tel: "+27762207592" },
+    { label: "Calls", number: "0645569752", tel: "+27645569752" },
+    { label: "WhatsApp", number: "0645569752", tel: "+27645569752" },
   ],
   emails: [" info@njshuttleservice.co.za"],
 };
