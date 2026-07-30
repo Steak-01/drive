@@ -3,7 +3,7 @@ import { DashboardShell } from "../../components/dashboard-shell";
 import { BookingForm } from "../../components/booking-form";
 
 export const Route = createFileRoute("/_authenticated/book")({
-  head: () => ({ meta: [{ title: "Book a Lesson — Driving School Dashboard" }] }),
+  head: () => ({ meta: [{ title: "Book a Ride — Shuttle Sevices Dashboard" }] }),
   component: BookPage,
 });
 
@@ -12,7 +12,7 @@ function BookPage() {
   return (
     <DashboardShell area="student">
       <div className="mx-auto max-w-xl">
-        <h2 className="font-display text-2xl font-bold uppercase">Book a Lesson</h2>
+        <h2 className="font-display text-2xl font-bold uppercase">Book a Ride</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Pick a package, an instructor and a time. We'll confirm your booking shortly.
         </p>
