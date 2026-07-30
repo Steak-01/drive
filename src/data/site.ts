@@ -10,7 +10,7 @@ export interface ServicePackage {
 }
 export const bankingDetails = {
   bank: "Capitec",
-  accountHolder: "NJ Services",
+  accountHolder: "NJ Driving School & Shuttle Services",
   accountNumber: "1055441999",
   branchCode: "470010q",
   reference: "Booking (Trip Type)",
