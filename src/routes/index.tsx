@@ -178,10 +178,6 @@ function Home() {
               width={1600}
               height={1100}
             />
-            <div className="absolute -bottom-5 -left-3 hidden rounded-xl bg-background p-4 text-foreground shadow-elegant sm:block">
-              <p className="font-display text-2xl font-bold text-primary">R150–R200 OFF</p>
-              <p className="text-xs font-semibold text-muted-foreground">First 10 customers</p>
-            </div>
           </div>
         </div>
       </section>
