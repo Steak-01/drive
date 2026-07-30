@@ -11,7 +11,6 @@ import { type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
-import { PromoBanner } from "../components/promo-banner";
 import { Toaster } from "../components/ui/sonner"; // was: from "sonner"
 
 function NotFoundComponent() {
@@ -118,7 +117,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
-        <PromoBanner />
         <SiteHeader />
         <main className="flex-1">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

@@ -79,7 +79,7 @@ function Services() {
           </h1>
           <p className="mt-4 max-w-2xl text-white/80">
             Airport transfers, local trips, day trips and vacation transport — every trip is
-            quoted individually, with no hidden fees. First 10 customers get R150–R200 off.
+            quoted individually, with no hidden fees.
           </p>
           <ul className="mt-6 grid max-w-lg grid-cols-2 gap-2">
             {[

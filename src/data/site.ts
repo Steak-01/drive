@@ -24,7 +24,7 @@ export const contactInfo = {
   since: "Since 2026",
   phones: [
     { label: "Calls", number: "0645569752", tel: "+27645569752" },
-    { label: "WhatsApp", number: "0645569752", tel: "+27645569752" },
+    { label: "Personal line", number: "0813230184", tel: "+27813230184" },
   ],
   emails: [" info@njshuttleservice.co.za"],
 };

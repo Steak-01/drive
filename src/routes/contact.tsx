@@ -75,16 +75,6 @@ function Contact() {
         <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.2fr] lg:px-8">
           {/* Contact details */}
           <div>
-            <div className="rounded-xl border border-primary bg-accent/40 p-5">
-              <div className="flex items-center gap-2 font-bold text-primary">
-                <Tag className="h-5 w-5" /> Opening Special
-              </div>
-              <p className="mt-1 text-sm text-foreground">
-                First 10 customers get <strong>R150–R200 OFF</strong>. Mention it when you contact
-                us!
-              </p>
-            </div>
-
             <h2 className="mt-8 font-display text-2xl font-bold uppercase">Get in touch</h2>
             <ul className="mt-5 space-y-4">
               {contactInfo.phones.map((p) => (
