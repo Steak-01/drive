@@ -387,9 +387,6 @@ function Home() {
           <h2 className="font-display text-3xl font-bold uppercase sm:text-4xl">
             Ready to get moving?
           </h2>
-          <p className="max-w-xl text-white/90">
-            Join now and lock in the opening special — the first 10 customers save R150–R200.
-          </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild variant="dark" size="xl">
               <Link to="/book">Book a Trip</Link>
