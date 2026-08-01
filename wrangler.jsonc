@@ -3,7 +3,7 @@
   "compatibility_date": "2026-07-29",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
-  "directory": "./drive"
+  "directory": "./dist"
   },
 
   "vars": {
